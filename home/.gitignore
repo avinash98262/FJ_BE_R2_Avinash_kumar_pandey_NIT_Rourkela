@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+
+# Virtual Environment
+venv/
+.env
+
+# Editor/IDE-specific files
+.idea/
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Compiled Python files
+*.pyc
+
+# Compiled Markdown files
+*.html
+
+# Database files
+*.sqlite3
+*.sqlite
+db.sqlite3
+
+# Environment variables
+.env
+
+# Secret keys
+*.key
+
+# Logs
+logs/
+*.log
+
+# Dependencies
+__pycache__/
+*.egg-info/
+dist/
+build/

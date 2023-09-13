@@ -1,70 +1,97 @@
 {% extends "base.html" %} 
 {% block start %}
 
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="mb-4">Expense Tracker</h2>
 
-<h2>Expense Tracker</h2>
-
-<div class="container">
-  <h4>Your Balance</h4>
-  <h1 id="balance">${{profile.balance}}</h1>
-
-  <div class="inc-exp-container">
-    <div>
-      <h4>Income</h4>
-      <p id="money-plus" class="money plus">+${{profile.income}}</p>
+            <div class="card">
+                <div class="card-body">
+                    <!-- Add a table to display expenses -->
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                                <tr>
+                                    <td>{{ expense.name }}</td>
+                                    <td>{{ expense.amount }}</td>
+                                    <td>{{ expense.expense_type }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <!-- Add a card for the pie chart -->
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="expenseChart" width="200" height="200"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-      <h4>Expense</h4>
-      <p id="money-minus" class="money minus">-${{profile.expenses}}</p>
-    </div>
-  </div>
-
-  <h3>History</h3>
-  <ul id="list" class="list">
-
-    {% for expense in expenses%}
-    {% if expense.expense_type == 'Positive'%}
-    <li class="plus">
-      {{expense.name}} <span>+${{expense.amount}}</span>
-    </li>
-    {% else %}
-    <li class="minus">
-      {{expense.name}} <span>-${{expense.amount}}</span>
-    </li>
-    {% endif %}
-    {% endfor %}
-
-
-  </ul>
-
-  <h3>Add new transaction</h3>
-  <form id="form" method="POST">
-    {% csrf_token %}
-    <div class="form-control">
-      <label for="text">Text</label>
-      <input type="text" required name="text" id="text" placeholder="Enter text..." />
-    </div>
-    <div class="form-control">
-      <label for="amount"
-        >Amount <br />
-        (negative - expense, positive - income)</label
-      >
-      <input type="number" required name="amount" id="amount" placeholder="Enter amount..." />
-    </div>
-
-    <div class="form-control">
-      <label for="text">Text</label>
-      <select name="expense_type" required class="form-control">
-        <option value="Positive">Positive</option>
-        <option value="Negative">Negative</option>
-      </select>
-    </div>
-    <button class="btn" type="submit">Add transaction</button>
-  </form>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script>
+    var ctx = document.getElementById('expenseChart').getContext('2d');
+    var expenseChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ expense_types|safe }},
+            datasets: [{
+                data: {{ expense_amounts|safe }},
+                backgroundColor: ['#36A2EB', '#FF6384'],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: 'right',
+            },
+        },
+    });
+</script>
 
-
-
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="mb-4">Add New Transaction</h3>
+                    <form id="form" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="text">Text</label>
+                            <input type="text" required name="text" id="text" class="form-control" placeholder="Enter text...">
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount (negative - expense, positive - income)</label>
+                            <input type="number" required name="amount" id="amount" class="form-control" placeholder="Enter amount...">
+                        </div>
+                        <div class="form-group">
+                            <label for="expense_type">Type</label>
+                            <select name="expense_type" required class="form-control">
+                                <option value="Positive">Positive</option>
+                                <option value="Negative">Negative</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Add Transaction</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
