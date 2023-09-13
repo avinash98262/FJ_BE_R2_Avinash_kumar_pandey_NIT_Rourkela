@@ -1,0 +1,5 @@
+services:
+  - name: web
+    env: python
+    buildCommand: python manage.py collectstatic --noinput
+    startCommand: gunicorn expense.wsgi
