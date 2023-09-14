@@ -28,7 +28,7 @@ Thumbs.db
 *.pyc
 
 # Compiled Markdown files
-*.html
+
 
 # Database files
 *.sqlite3
