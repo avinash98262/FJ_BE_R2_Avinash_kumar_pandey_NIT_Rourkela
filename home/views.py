@@ -1,17 +1,19 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-
-from .models import *
-
-
+from .models import Profile, Expense
 @login_required
 def home(request):
-    profile = Profile.objects.filter(user=request.user).first()
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        # If the profile does not exist for the user, create one with default values
+        profile = Profile(user=request.user, balance=0, expenses=0, income=0)
+        profile.save()
+
     expenses = Expense.objects.filter(user=request.user)
 
     if request.method == 'POST':
@@ -43,40 +45,35 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
-
 def register_page(request):
     if request.method == 'POST':
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
 
-        # Check if the username is already taken
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Username is already taken. Please choose a different one.')
             return redirect('register_page')
 
-        # Create a new user
         user = User.objects.create_user(username=username, email=email, password=password)
-        user.save()
 
-        # Create a Profile object for the new user
-        profile = Profile(user=user, balance=0, expenses=0)  # You can set initial balance and expenses as needed
-        profile.save()
-
-        # Log in the user after registration
-        user = authenticate(username=username, password=password)
         if user is not None:
-            login(request, user)
-            messages.success(request, 'Registration successful. You are now logged in.')
-            return redirect('home')  # Replace 'home' with the URL name of your home page
+            # Check if a Profile object already exists for the user
+            try:
+                profile = Profile.objects.get(user=user)
+            except Profile.DoesNotExist:
+                # If no profile exists, create one
+                profile = Profile(user=user, balance=0, expenses=0, income=0)
+                profile.save()
+
+            # Log in the user after registration
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, 'Registration successful. You are now logged in.')
+                return redirect('home')
 
     return render(request, 'register.html')
-
-
-
-
-
-
 
 def login_page(request):
     if request.method == 'POST':
@@ -88,7 +85,7 @@ def login_page(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Login successful.')
-            return redirect('home')  # Replace 'home' with the URL name of your home page
+            return redirect('home')
         else:
             messages.error(request, 'Invalid username or password. Please try again.')
 
