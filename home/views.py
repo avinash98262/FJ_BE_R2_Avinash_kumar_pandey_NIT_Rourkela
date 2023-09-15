@@ -5,6 +5,71 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from .models import Profile, Expense
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Expense, Profile
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def edit_expense(request, expense_id):
+    expense = get_object_or_404(Expense, id=expense_id, user=request.user)
+    profile = Profile.objects.get(user=request.user)
+
+    if request.method == 'POST':
+        # Get the original amount and type of the expense
+        original_amount = expense.amount
+        original_type = expense.expense_type
+
+        # Update the expense fields
+        expense.name = request.POST['text']
+        new_amount = float(request.POST['amount'])
+        new_type = request.POST['expense_type']
+        expense.amount = new_amount
+        expense.expense_type = new_type
+        expense.save()
+
+        # Calculate the change in balance and expenses
+        if original_type == 'Positive':
+            # The original expense increased the balance
+            profile.balance -= original_amount
+        else:
+            # The original expense increased the expenses
+            profile.expenses -= original_amount
+
+        if new_type == 'Positive':
+            # The updated expense increases the balance
+            profile.balance += new_amount
+        else:
+            # The updated expense increases the expenses
+            profile.expenses += new_amount
+
+        # Save the profile
+        profile.save()
+
+        # Redirect back to the home page or wherever you want
+        return redirect('home')
+
+    # Render the edit expense form
+    context = {'expense': expense}
+    return render(request, 'edit_expense.html', context)
+
+
+
+@login_required
+def delete_expense(request, expense_id):
+    expense = get_object_or_404(Expense, id=expense_id, user=request.user)
+
+    if request.method == 'POST':
+        # Handle the form submission for deleting the expense
+        expense.delete()
+
+        # Redirect back to the home page or wherever you want
+        return redirect('home')
+
+    # Render the delete expense confirmation page
+    context = {'expense': expense}
+    return render(request, 'delete_expense.html', context)
+
 @login_required
 def home(request):
     try:

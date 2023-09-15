@@ -15,6 +15,7 @@
                                 <th>Name</th>
                                 <th>Amount</th>
                                 <th>Type</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -23,6 +24,10 @@
                                     <td>{{ expense.name }}</td>
                                     <td>{{ expense.amount }}</td>
                                     <td>{{ expense.expense_type }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_expense' expense.id %}" class="btn btn-primary">Edit</a>
+                                        <a href="{% url 'delete_expense' expense.id %}" class="btn btn-danger">Delete</a>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -86,7 +91,7 @@
                                 <option value="Negative">Negative</option>
                             </select>
                         </div>
-                        <button class="btn btn-primary" type="submit">Add Transaction</button>
+                        <button class="btn btn-primary" type="submit" name="create_expense">Add Transaction</button>
                     </form>
                 </div>
             </div>
