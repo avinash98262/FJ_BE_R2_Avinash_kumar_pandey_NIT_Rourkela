@@ -1,6 +1,6 @@
 # FJ_BE_R2_Avinash_kumar_pandey_NIT_Rourkela
 
-HEY! I THINK THIS IS NOW BUG FREE , WE CAN DO ANYTHING FROM THIS APP.
+HEY! THIS IS NOW BUG FREE , WE CAN DO ANYTHING FROM THIS APP.
 
 https://finance-tracker-d1jf.onrender.com/
 
